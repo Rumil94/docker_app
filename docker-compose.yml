@@ -1,0 +1,54 @@
+version: '3.0'
+
+services:
+  nginx:
+    build:
+      context: docker/nginx
+    volumes:
+      - ./:/var/www/app
+    container_name: d_nginx
+    restart: always
+    ports:
+      - "8881:81"
+    networks:
+      - myProject
+
+  php-fpm:
+    build:
+      context: docker/php-fpm
+    volumes:
+      - ./:/var/www/app
+    container_name: d_php-fpm
+    restart: always
+    depends_on:
+      - mysql
+    networks:
+      - myProject
+
+  mysql:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    container_name: d_mysql
+    environment:
+      - "MYSQL_ROOT_PASSWORD=root"
+      - "MYSQL_DATABASE=symfony"
+      - "MYSQL_USER=admin"
+      - "MYSQL_PASSWORD=root"
+    ports:
+      - "3306:3337"
+    networks:
+      - myProject
+
+  mailer:
+    image: schickling/mailcatcher
+    container_name: d_mailer
+    ports:
+      - "1025"
+      - "8881:1080"
+    networks:
+      - myProject
+
+networks:
+  myProject:
+    driver: bridge
