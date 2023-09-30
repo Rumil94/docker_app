@@ -12,7 +12,7 @@ use const Grpc\STATUS_OK;
 
 class IndexController extends AbstractController
 {
-    #[Route('/index', name: 'app_index')]
+    #[Route('/', name: 'app_index')]
     public function index(): JsonResponse
     {
         return $this->json([
