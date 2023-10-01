@@ -1,0 +1,233 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Задачи{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#form-modal">Создать задачу</button>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th class="text-center">№</th>
+                            <th class="text-center">Название</th>
+                            <th class="text-center">Контент</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tasks-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="form-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form>
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Добавление новой задачи</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for message in app.flashes('notice') %}
+                            <div class="alert alert-warning">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                        <input type="hidden" name="update_id" id="update_id">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label for="title" class="col-form-label">Название</label>
+                                <input type="text" id="title" class="form-control" name="title">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label for="content" class="col-form-label">Содержание</label>
+                                <textarea id="content" class="form-control" name="content" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                        <button type="button" class="btn btn-primary" id="save-project-btn">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="view-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Информация</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <b>Название:</b>
+                    <p id="title-info"></p>
+                    <b>Содержание:</b>
+                    <p id="content-info"></p>
+                    <b>Дата создания:</b>
+                    <p id="created-at-info"></p>
+                    <b>Дата изменения:</b>
+                    <p id="updated-at-info"></p>
+                    <b>Закрыта:</b>
+                    <p id="is-finished-info"></p>
+                    <b>Автор:</b>
+                    <p id="user-info"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        showAllTasks();
+
+        function showAllTasks() {
+            $.ajax({
+                url: '/task/show-all',
+                method: 'GET',
+                success: function (response) {
+                    let table = $('#tasks-table-body');
+                    table.html('');
+                    let tasks = response;
+                    for (let i = 0; i < tasks.length; i++) {
+                        let showBtn = '<button class="btn btn-outline-info" onclick="showTask(' + tasks[i].id + ')">Открыть</button>';
+                        let editBtn = '<button class="btn btn-outline-success" onclick="editTask(' + tasks[i].id + ')">Изменить</button>';
+                        let deleteBtn = '<button class="btn btn-outline-danger" onclick="deleteTask(' + tasks[i].id + ')">Удалить</button>';
+
+                        let taskRow = '<tr>' +
+                                            '<td class="text-center" style="width: 60px;">' + (i + 1) + '</td>' +
+                                            '<td class="text-center" style="width: 60px;">' + tasks[i].id + '</td>' +
+                                            '<td>' + tasks[i].title + '</td>' +
+                                            '<td>' + tasks[i].content + '</td>' +
+                                            '<td class="text-center" style="width: 300px;">' + showBtn + ' ' + editBtn + ' ' + deleteBtn + '</td>' +
+                                        '</tr>';
+                        table.append(taskRow);
+                    }
+                },
+                error: function (response) {
+                    console.log(response);
+                }
+            });
+        }
+
+        function storeProject() {
+            let data = {
+                title: $("#title").val(),
+                content: $("#content").val(),
+            };
+            $.ajax({
+                url: '/task/create',
+                method: 'POST',
+                data: data,
+                success: function (response) {
+                    if (response.success === true) {
+                        showAllTasks();
+                        $('#form-modal').modal('hide');
+                    }
+                },
+                error: function (response) {
+                    console.log(response);
+                }
+            });
+        }
+
+        function updateProject() {
+            let data = {
+                title: $("#title").val(),
+                content: $("#content").val(),
+            };
+            $.ajax({
+                url: '/task/update/' + $("#update_id").val(),
+                method: 'PUT',
+                data: data,
+                success: function (response) {
+                    if (response.success === true) {
+                        showAllTasks();
+                        $('#form-modal').modal('hide');
+                    }
+                },
+                error: function (response) {
+                    console.log(response);
+                }
+            });
+        }
+
+        $('#save-project-btn').click(function(event) {
+            event.preventDefault();
+            if ($('#update_id').val() == null || $('#update_id').val() == "") {
+                storeProject();
+            } else {
+                updateProject();
+            }
+        });
+
+        function showTask(id) {
+            $('#title-info').html('');
+            $('#content-info').html('');
+            $('#created-at-info').html('');
+            $('#updated-at-info').html('');
+            $('#is-finished-info').html('');
+            $('#user-info').html('');
+            $.ajax({
+                url: '/task/show/' + id,
+                method: 'POST',
+                success: function (response) {
+                    let task = response;
+                    $('#title-info').html(task.title);
+                    $('#content-info').html(task.content);
+                    $('#created-at-info').html(task.created_at);
+                    $('#updated-at-info').html(task.updated_at);
+                    $('#is-finished-info').html(task.is_finished);
+                    $('#user-info').html(task.user);
+                    $('#view-modal').modal('show');
+                },
+                error: function (response) {
+                    console.log(response);
+                }
+            });
+        }
+
+        function editTask(id) {
+            $.ajax({
+                url: '/task/show/' + id,
+                method: 'POST',
+                success: function (response) {
+                    let task = response;
+                    $("#update_id").val(task.id);
+                    $('#title').html(task.title);
+                    $('#content').html(task.content);
+                    $('#save-project-btn').text('Сохранить');
+                    $('#form-modal').modal('show');
+                },
+                error: function (response) {
+                    console.log(response);
+                }
+            });
+        }
+
+        function deleteTask(id) {
+            if (confirm('Вы действительно хотите удалить данную задачу?')) {
+                $.ajax({
+                    url: '/task/delete/' + id,
+                    method: 'DELETE',
+                    success: function (response) {
+                        if (response.success === true) {
+                            showAllTasks();
+                        }
+                    },
+                    error: function (response) {
+                        console.log(response);
+                    }
+                });
+            }
+        }
+    </script>
+{% endblock %}
