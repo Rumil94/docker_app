@@ -64,6 +64,14 @@ services:
     networks:
       - myProject
 
+  redis:
+    image: redis
+    container_name: d_redis
+    ports:
+      - '6379:6379'
+    networks:
+      - myProject
+
 networks:
   myProject:
     driver: bridge

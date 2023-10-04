@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\TaskService;
+use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,10 +13,11 @@ class TaskController extends AbstractController
 {
 
     #[Route('/task', name: 'task')]
-    public function index(): Response
+    public function index(UserService $userService): Response
     {
+        $users = $userService->list();
         return $this->render('task/index.html.twig', [
-            'controller_name' => 'TaskController',
+            'users' => $users,
         ]);
     }
 

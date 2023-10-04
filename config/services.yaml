@@ -22,3 +22,14 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+#    Redis:
+#        class: Redis
+#        calls:
+#            - connect:
+#                  - '%env(REDIS_HOST)%'
+#                  - '%env(int:REDIS_PORT)%'
+#                  -
+#    Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
+#        arguments:
+#            - '@Redis'

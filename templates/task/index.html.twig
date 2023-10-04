@@ -6,9 +6,15 @@
     <div class="container">
         <div class="card">
             <div class="card-header">
-                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#form-modal">Создать задачу</button>
+                {% if app.user %}
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#form-modal">Создать задачу</button>
+                    <a class="float-end" href="{{ path('app_logout') }}">Выйти</a>
+                {% elseif not app.user %}
+                    <p>Задачи могут создавать только авторизованные пользователи! <a href="{{ path('app_login') }}">Авторизация</a></p>
+                {% endif %}
             </div>
             <div class="card-body">
+                <h3 class="mb-3">Список задач:</h3>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -51,10 +57,21 @@
                                 <textarea id="content" class="form-control" name="content" rows="3"></textarea>
                             </div>
                         </div>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <select id="users" class="form-select form-select-sm">
+                                        {% for user in users %}
+                                            <option value="{{ user.id }}">{{ user.email }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                        <button type="button" class="btn btn-primary" id="save-project-btn">Добавить</button>
+                        <button type="button" class="btn btn-primary" id="save-task-btn">Добавить</button>
                     </div>
                 </form>
             </div>
@@ -122,6 +139,7 @@
             let data = {
                 title: $("#title").val(),
                 content: $("#content").val(),
+                user_id: $("#users").val(),
             };
             $.ajax({
                 url: '/task/create',
@@ -160,7 +178,7 @@
             });
         }
 
-        $('#save-project-btn').click(function(event) {
+        $('#save-task-btn').click(function(event) {
             event.preventDefault();
             if ($('#update_id').val() == null || $('#update_id').val() == "") {
                 storeProject();
@@ -204,7 +222,7 @@
                     $("#update_id").val(task.id);
                     $('#title').html(task.title);
                     $('#content').html(task.content);
-                    $('#save-project-btn').text('Сохранить');
+                    $('#save-task-btn').text('Сохранить');
                     $('#form-modal').modal('show');
                 },
                 error: function (response) {
