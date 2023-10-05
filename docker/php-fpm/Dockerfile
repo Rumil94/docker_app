@@ -19,4 +19,6 @@ RUN docker-php-ext-configure gd \
 
 RUN docker-php-ext-install pdo pdo_mysql gd intl
 
+RUN pecl install -o -f redis && docker-php-ext-enable redis
+
 WORKDIR /var/www/app

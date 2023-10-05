@@ -60,7 +60,7 @@ services:
     container_name: d_mailer
     ports:
       - "1025"
-      - "8881:1080"
+      - "1080:1080"
     networks:
       - myProject
 
