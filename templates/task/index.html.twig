@@ -24,8 +24,25 @@
                             <th class="text-center">Контент</th>
                         </tr>
                     </thead>
-                    <tbody id="tasks-table-body"></tbody>
+                    <tbody id="tasks-table-body">
+                        {% for task in paginator.items %}
+                            <tr>
+                                <td class="text-center" style="width: 60px;">{{ loop.index }}</td>
+                                <td class="text-center" style="width: 60px;">{{ task.id }}</td>
+                                <td>{{ task.title }}</td>
+                                <td>{{ task.content }}</td>
+                                {% if app.user %}
+                                    <td class="text-center" style="width: 300px;">
+                                        <button class="btn btn-outline-info" onclick="showTask({{ task.id }})">Открыть</button>
+                                        <button class="btn btn-outline-success" onclick="editTask({{ task.id }})">Изменить</button>
+                                        <button class="btn btn-outline-danger" onclick="deleteTask({{ task.id }})">Удалить</button>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
                 </table>
+                {% include('/utils/paginator.html.twig') %}
             </div>
         </div>
     </div>
@@ -104,7 +121,6 @@
     </div>
 
     <script type="text/javascript">
-        showAllTasks();
 
         function showAllTasks() {
             $.ajax({
