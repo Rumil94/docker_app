@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Task;
 use App\Repository\TaskRepository;
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\SecurityBundle\Security;
 
 class TaskService {
@@ -109,5 +110,13 @@ class TaskService {
             'user' => $task->getUser()->getEmail()
         ];
         return $data ?? [];
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    public function getTasksQuery(): QueryBuilder
+    {
+        return $this->taskRepository->createQueryBuilder('t')->orderBy('t.id', 'DESC');
     }
 }

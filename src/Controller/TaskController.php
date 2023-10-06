@@ -2,11 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Task;
 use App\Utils\Paginator;
 use App\Service\TaskService;
 use App\Service\UserService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,13 +21,12 @@ class TaskController extends AbstractController
     }
 
     #[Route('/task', name: 'task')]
-    public function index(Request $request, Paginator $paginator, EntityManagerInterface $entityManager): Response
+    public function index(Request $request, Paginator $paginator): Response
     {
         $limit = 15;
         $page = $request->get('page', 1);
         $startNum = $page != 1 ? $page * $limit - $limit : 0;
-        $repository = $entityManager->getRepository(Task::class);
-        $query =  $repository->createQueryBuilder('t')->orderBy('t.id', 'DESC');
+        $query =  $this->taskService->getTasksQuery();
         $paginator->paginate($query, $page, $limit);
         $users = $this->userService->list();
         return $this->render('task/index.html.twig', [
