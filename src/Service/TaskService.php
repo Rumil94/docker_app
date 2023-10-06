@@ -41,9 +41,9 @@ class TaskService {
 
     /**
      * @param object $data
-     * @return bool
+     * @return int|bool|null
      */
-    public function save(object $data): bool
+    public function save(object $data): int|bool|null
     {
         $task = new Task();
         $task->setTitle($data->get('title'));
@@ -51,10 +51,10 @@ class TaskService {
         $task->setCreatedAt(new \DateTime('now'));
         $task->setIsFinished(false);
         $task->setUser($this->security->getUser());
-        if ($this->taskRepository->save($task)) {
-            return true;
+        if (!$this->taskRepository->save($task)) {
+            return false;
         }
-        return false;
+        return $task->getId();
     }
 
     /**

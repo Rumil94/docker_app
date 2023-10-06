@@ -8,6 +8,8 @@ use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
 class TaskController extends AbstractController
@@ -20,6 +22,11 @@ class TaskController extends AbstractController
         $this->taskService = $taskService;
     }
 
+    /**
+     * @param Request $request
+     * @param Paginator $paginator
+     * @return Response
+     */
     #[Route('/task', name: 'task')]
     public function index(Request $request, Paginator $paginator): Response
     {
@@ -92,13 +99,25 @@ class TaskController extends AbstractController
 
     /**
      * @param Request $request
+     * @param MailerInterface $mailer
      * @return Response
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
      */
     #[Route('/task/create', name: 'task_create', methods: ['POST'])]
-    public function create(Request $request): Response
+    public function create(Request $request, MailerInterface $mailer): Response
     {
         $data = $request->request;
         $answer = $this->taskService->save($data);
+        if ($answer) {
+            $email = (new Email())
+                ->from('hello@example.com')
+                ->to('admin@example.com')
+                ->subject('Новая задача')
+                ->text('Создана новая задача!')
+                ->html('<p>Пользователь: ' . $this->getUser()->getUserIdentifier() . '</p><p>Номер задачи: ' . $answer . '</p>');
+
+            $mailer->send($email);
+        }
         return $this->json(['success' => (bool)$answer]);
     }
 }
