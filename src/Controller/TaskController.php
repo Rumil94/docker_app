@@ -25,12 +25,16 @@ class TaskController extends AbstractController
     #[Route('/task', name: 'task')]
     public function index(Request $request, Paginator $paginator, EntityManagerInterface $entityManager): Response
     {
+        $limit = 15;
+        $page = $request->get('page', 1);
+        $startNum = $page != 1 ? $page * $limit - $limit : 0;
         $repository = $entityManager->getRepository(Task::class);
         $query =  $repository->createQueryBuilder('t')->orderBy('t.id', 'DESC');
-        $paginator->paginate($query, $request->get('page', 1), 20);
+        $paginator->paginate($query, $page, $limit);
         $users = $this->userService->list();
         return $this->render('task/index.html.twig', [
             'users' => $users,
+            'startNum' => $startNum,
             'paginator' => $paginator
         ]);
     }

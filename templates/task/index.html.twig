@@ -7,7 +7,7 @@
         <div class="card">
             <div class="card-header">
                 {% if app.user %}
-                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#form-modal">Создать задачу</button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#form-modal" onclick="createTask(event)">Создать задачу</button>
                     <a class="float-end" href="{{ path('app_logout') }}">Выйти</a>
                 {% elseif not app.user %}
                     <p>Задачи могут создавать только авторизованные пользователи! <a href="{{ path('app_login') }}">Авторизация</a></p>
@@ -25,9 +25,11 @@
                         </tr>
                     </thead>
                     <tbody id="tasks-table-body">
+                        {% set num = startNum %}
                         {% for task in paginator.items %}
+                            {% set num = num + 1 %}
                             <tr>
-                                <td class="text-center" style="width: 60px;">{{ loop.index }}</td>
+                                <td class="text-center" style="width: 60px;">{{ num }}</td>
                                 <td class="text-center" style="width: 60px;">{{ task.id }}</td>
                                 <td>{{ task.title }}</td>
                                 <td>{{ task.content }}</td>
@@ -47,12 +49,12 @@
         </div>
     </div>
 
-    <div class="modal fade" id="form-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="form-modal" tabindex="-1" aria-labelledby="taskAddModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form>
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Добавление новой задачи</h5>
+                        <h5 class="modal-title" id="taskAddModalLabel">Добавление новой задачи</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                     </div>
                     <div class="modal-body">
@@ -75,9 +77,10 @@
                             </div>
                         </div>
                         {% if is_granted('ROLE_ADMIN') %}
-                            <div class="row">
+                            <div class="row" id="users-row">
                                 <div class="col-md-12">
-                                    <select id="users" class="form-select form-select-sm">
+                                    <label for="users" class="col-form-label">Автор</label>
+                                    <select id="users" class="form-select form-select-sm" name="users">
                                         {% for user in users %}
                                             <option value="{{ user.id }}">{{ user.email }}</option>
                                         {% endfor %}
@@ -121,6 +124,14 @@
     </div>
 
     <script type="text/javascript">
+
+        function createTask(event) {
+            event.preventDefault();
+            $('#taskAddModalLabel').text('Добавление новой задачи');
+            $('#update_id').val('');
+            $("#title").val('');
+            $("#content").val('');
+        }
 
         function showAllTasks() {
             $.ajax({
@@ -238,6 +249,7 @@
                     $("#update_id").val(task.id);
                     $('#title').html(task.title);
                     $('#content').html(task.content);
+                    $('#taskAddModalLabel').text('Изменение задачи №' + id);
                     $('#save-task-btn').text('Сохранить');
                     $('#form-modal').modal('show');
                 },

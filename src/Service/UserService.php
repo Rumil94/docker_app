@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\User;
 use App\Repository\UserRepository;
 
 class UserService
@@ -21,5 +22,10 @@ class UserService
             ];
         }
         return $data ?? [];
+    }
+
+    public function get(int $id): User
+    {
+        return $this->userRepository->find($id);
     }
 }
