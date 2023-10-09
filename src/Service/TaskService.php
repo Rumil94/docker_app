@@ -69,9 +69,6 @@ class TaskService {
             $task->setTitle($data->get('title'));
             $task->setContent($data->get('content'));
             $task->setUpdatedAt(new \DateTime('now'));
-//            if ($data->get('user_id')) {
-//
-//            }
             if ($this->taskRepository->save($task)) {
                 return true;
             }
@@ -113,10 +110,24 @@ class TaskService {
     }
 
     /**
+     * @param array $params
      * @return QueryBuilder
      */
-    public function getTasksQuery(): QueryBuilder
+    public function getTasksQuery(array $params = []): QueryBuilder
     {
-        return $this->taskRepository->createQueryBuilder('t')->orderBy('t.id', 'DESC');
+        $qb = $this->taskRepository->createQueryBuilder('t');
+
+        if (isset($params['term']) && !empty($params['term'])) {
+            $term = $params['term'];
+            $qb->andWhere('t.title like :term or t.content like :term')
+                ->setParameter('term', '%'.$term.'%');
+        }
+
+        if (isset($params['userId']) && !empty($params['userId'])) {
+            $userId = $params['userId'];
+            $qb->andWhere('t.user_id = ' . $userId);
+        }
+
+        return $qb->addOrderBy('t.id','DESC');
     }
 }

@@ -5,21 +5,17 @@
 
 {% if paginator.lastPage > 1 %}
     <nav>
-        <ul class="pagination justify-content-center">
+        <ul id="{{ block }}" class="pagination justify-content-center">
             <li class="page-item{{ _currentPage <= 1 ? ' disabled' : '' }}">
-                <a class="page-link" href="{{ path(_currentRoute, _currentParams|merge({page: _currentPage - 1})) }}" aria-label="Previous">
-                    &laquo; Назад
-                </a>
+                <span class="page-link" style="cursor: pointer;" aria-label="Previous" onclick="getByPage('{{ block }}', {{ _currentPage - 1 }})">&laquo; Назад</span>
             </li>
             {% for i in 1..paginator.lastPage %}
                 <li class="page-item {% if i == _currentPage %}active{% endif %}">
-                    <a class="page-link" href="{{ path(_currentRoute, _currentParams|merge({page: i})) }}">{{ i }}</a>
+                    <span class="page-link" style="cursor: pointer;" onclick="getByPage('{{ block }}', {{ i }})">{{ i }}</span>
                 </li>
             {% endfor %}
             <li class="page-item {{ _currentPage >= paginator.lastPage ? ' disabled' : '' }}">
-                <a class="page-link" href="{{ path(_currentRoute, _currentParams|merge({page: _currentPage + 1})) }}" aria-label="Next">
-                    Далее &raquo;
-                </a>
+                <span class="page-link" style="cursor: pointer;" aria-label="Next" onclick="getByPage('{{ block }}', {{ _currentPage + 1 }})">Далее &raquo;</span>
             </li>
         </ul>
     </nav>

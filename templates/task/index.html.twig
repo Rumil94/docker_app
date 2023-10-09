@@ -14,37 +14,19 @@
                 {% endif %}
             </div>
             <div class="card-body">
+                <div class="mb-2">
+                    <input id="query" class="form-control" type="text" placeholder="Поиск...">
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="open" value="open" checked>
+                    <label class="form-check-label" for="open">Открытые</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="close" value="close" checked>
+                    <label class="form-check-label" for="close">Закрытые</label>
+                </div>
                 <h3 class="mb-3">Список задач:</h3>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th class="text-center">#</th>
-                            <th class="text-center">№</th>
-                            <th class="text-center">Название</th>
-                            <th class="text-center">Контент</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tasks-table-body">
-                        {% set num = startNum %}
-                        {% for task in paginator.items %}
-                            {% set num = num + 1 %}
-                            <tr>
-                                <td class="text-center" style="width: 60px;">{{ num }}</td>
-                                <td class="text-center" style="width: 60px;">{{ task.id }}</td>
-                                <td>{{ task.title }}</td>
-                                <td>{{ task.content }}</td>
-                                {% if app.user %}
-                                    <td class="text-center" style="width: 300px;">
-                                        <button class="btn btn-outline-info" onclick="showTask({{ task.id }})">Открыть</button>
-                                        <button class="btn btn-outline-success" onclick="editTask({{ task.id }})">Изменить</button>
-                                        <button class="btn btn-outline-danger" onclick="deleteTask({{ task.id }})">Удалить</button>
-                                    </td>
-                                {% endif %}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% include('/utils/paginator.html.twig') %}
+                <div id="tasks"></div>
             </div>
         </div>
     </div>
@@ -124,6 +106,39 @@
     </div>
 
     <script type="text/javascript">
+        showAllTasks();
+
+        $('#query').on('change', function (event) {
+            let val = event.target.value;
+            $.ajax({
+                url: '/task/show-all?query=' + val,
+                method: 'GET',
+                success: function (response) {
+                    $('#tasks').html(response);
+                },
+                error: function (response) {
+                    console.log(response);
+                }
+            });
+        });
+
+        function getByPage(block, page) {
+            if (block === 'pag_tasks') {
+                if (page < 0 || page === undefined) {
+                    page = 1;
+                }
+                $.ajax({
+                    url: '/task/show-all?page=' + page,
+                    method: 'GET',
+                    success: function (response) {
+                        $('#tasks').html(response);
+                    },
+                    error: function (response) {
+                        console.log(response);
+                    }
+                });
+            }
+        }
 
         function createTask(event) {
             event.preventDefault();
@@ -138,23 +153,7 @@
                 url: '/task/show-all',
                 method: 'GET',
                 success: function (response) {
-                    let table = $('#tasks-table-body');
-                    table.html('');
-                    let tasks = response;
-                    for (let i = 0; i < tasks.length; i++) {
-                        let showBtn = '<button class="btn btn-outline-info" onclick="showTask(' + tasks[i].id + ')">Открыть</button>';
-                        let editBtn = '<button class="btn btn-outline-success" onclick="editTask(' + tasks[i].id + ')">Изменить</button>';
-                        let deleteBtn = '<button class="btn btn-outline-danger" onclick="deleteTask(' + tasks[i].id + ')">Удалить</button>';
-
-                        let taskRow = '<tr>' +
-                                            '<td class="text-center" style="width: 60px;">' + (i + 1) + '</td>' +
-                                            '<td class="text-center" style="width: 60px;">' + tasks[i].id + '</td>' +
-                                            '<td>' + tasks[i].title + '</td>' +
-                                            '<td>' + tasks[i].content + '</td>' +
-                                            '<td class="text-center" style="width: 300px;">' + showBtn + ' ' + editBtn + ' ' + deleteBtn + '</td>' +
-                                        '</tr>';
-                        table.append(taskRow);
-                    }
+                    $('#tasks').html(response);
                 },
                 error: function (response) {
                     console.log(response);

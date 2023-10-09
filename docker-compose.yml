@@ -6,7 +6,7 @@ services:
       context: docker/nginx
     volumes:
       - ./:/var/www/app
-    container_name: d_nginx
+    container_name: nginx
     restart: always
     ports:
       - "8881:81"
@@ -18,7 +18,7 @@ services:
       context: docker/php-fpm
     volumes:
       - ./:/var/www/app
-    container_name: d_php-fpm
+    container_name: php-fpm
     restart: always
     depends_on:
       - mysql
@@ -28,7 +28,7 @@ services:
   mysql:
     image: mysql
     restart: always
-    container_name: d_mysql
+    container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: symfony
@@ -45,7 +45,7 @@ services:
       - mysql
     image: phpmyadmin/phpmyadmin
     restart: always
-    container_name: d_phpmyadmin
+    container_name: phpmyadmin
 
     environment:
       PMA_HOST: mysql
@@ -57,7 +57,7 @@ services:
 
   mailer:
     image: schickling/mailcatcher
-    container_name: d_mailer
+    container_name: mailer
     ports:
       - "1025"
       - "1080:1080"
@@ -66,9 +66,38 @@ services:
 
   redis:
     image: redis
-    container_name: d_redis
+    container_name: redis
     ports:
       - '6379:6379'
+    networks:
+      - myProject
+
+  elasticsearch:
+    image: elasticsearch:8.10.2
+    container_name: elasticsearch
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - '9200:9200'
+    networks:
+      - myProject
+
+  kibana:
+    image: kibana:8.10.2
+    container_name: kibana
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    ports:
+      - '5601:5601'
     networks:
       - myProject
 

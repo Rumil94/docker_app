@@ -22,35 +22,41 @@ class TaskController extends AbstractController
         $this->taskService = $taskService;
     }
 
+    #[Route('/task', name: 'task')]
+    public function index(): Response
+    {
+        $users = $this->userService->list();
+        return $this->render('task/index.html.twig', [
+            'users' => $users,
+        ]);
+    }
+
     /**
      * @param Request $request
      * @param Paginator $paginator
      * @return Response
      */
-    #[Route('/task', name: 'task')]
-    public function index(Request $request, Paginator $paginator): Response
+    #[Route('/task/show-all', name: 'task_show_all', methods: ['GET'])]
+    public function showAll(Request $request, Paginator $paginator): Response
     {
         $limit = 15;
         $page = $request->get('page', 1);
+        $term = $request->get('query', '');
         $startNum = $page != 1 ? $page * $limit - $limit : 0;
-        $query =  $this->taskService->getTasksQuery();
+        $params = ['term' => $term];
+        if ($this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY')
+            && (!$this->isGranted('ROLE_ADMIN') || !$this->isGranted('ROLE_MODERATOR'))
+        ) {
+            $params += ['userId' => $this->getUser()->getId()];
+        }
+        $query =  $this->taskService->getTasksQuery($params);
         $paginator->paginate($query, $page, $limit);
-        $users = $this->userService->list();
-        return $this->render('task/index.html.twig', [
-            'users' => $users,
-            'startNum' => $startNum,
-            'paginator' => $paginator
-        ]);
-    }
-
-    /**
-     * @return Response
-     */
-    #[Route('/task/show-all', name: 'task_show_all', methods: ['GET'])]
-    public function showAll(): Response
-    {
-        $tasks = $this->taskService->list();
-        return $this->json($tasks);
+        return new Response(
+            $this->renderView('task/list.html.twig', [
+                'startNum' => $startNum,
+                'paginator' => $paginator
+            ])
+        );
     }
 
     /**
@@ -114,7 +120,7 @@ class TaskController extends AbstractController
                 ->to('admin@example.com')
                 ->subject('Новая задача')
                 ->text('Создана новая задача!')
-                ->html('<p>Пользователь: ' . $this->getUser()->getUserIdentifier() . '</p><p>Номер задачи: ' . $answer . '</p>');
+                ->html('<p>Пользователь: ' . $this->getUser()->getUserIdentifier() . '</p><p>Номер задачи: <b>' . $answer . '</b></p>');
 
             $mailer->send($email);
         }
