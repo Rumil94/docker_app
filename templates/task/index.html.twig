@@ -108,11 +108,23 @@
     <script type="text/javascript">
         showAllTasks();
 
+        let params = [];
+
+        function getObject(params) {
+            return params.reduce(function(result, item) {
+                let key = Object.keys(item)[0];
+                result[key] = item[key];
+                return result;
+            }, {});
+        }
+
         $('#query').on('change', function (event) {
             let val = event.target.value;
+            params.push({query: val});
             $.ajax({
-                url: '/task/show-all?query=' + val,
+                url: '/task/show-all',
                 method: 'GET',
+                data: getObject(params),
                 success: function (response) {
                     $('#tasks').html(response);
                 },
@@ -145,9 +157,11 @@
             }
             $(this).addClass('active');
             $(this).attr("data-sort", sort);
+            params.push({ sort: sort });
             $.ajax({
-                url: '/task/show-all?sort=' + sort,
+                url: '/task/show-all',
                 method: 'GET',
+                data: getObject(params),
                 success: function (response) {
                     $('#tasks').html(response);
                 },
@@ -162,9 +176,11 @@
                 if (page < 0 || page === undefined) {
                     page = 1;
                 }
+                params.push({ page: page });
                 $.ajax({
-                    url: '/task/show-all?page=' + page,
+                    url: '/task/show-all',
                     method: 'GET',
+                    data: getObject(params),
                     success: function (response) {
                         $('#tasks').html(response);
                     },
