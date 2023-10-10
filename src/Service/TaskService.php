@@ -128,6 +128,13 @@ class TaskService {
             $qb->andWhere('t.user_id = ' . $userId);
         }
 
-        return $qb->addOrderBy('t.id','DESC');
+        if (isset($params['sort']) && !empty($params['sort'])) {
+            $arr = explode(' ', $params['sort']);
+            $qb->orderBy('t.' . $arr[0], $arr[1]);
+        } else {
+            $qb->orderBy('t.id','DESC');
+        }
+
+        return $qb;
     }
 }

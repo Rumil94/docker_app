@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Helpers\Helpers;
 use App\Utils\Paginator;
 use App\Service\TaskService;
 use App\Service\UserService;
@@ -26,8 +27,10 @@ class TaskController extends AbstractController
     public function index(): Response
     {
         $users = $this->userService->list();
+        $columns = Helpers::getColumnTitle();
         return $this->render('task/index.html.twig', [
             'users' => $users,
+            'columns' => $columns,
         ]);
     }
 
@@ -42,13 +45,24 @@ class TaskController extends AbstractController
         $limit = 15;
         $page = $request->get('page', 1);
         $term = $request->get('query', '');
+        $sort = $request->get('sort', '');
         $startNum = $page != 1 ? $page * $limit - $limit : 0;
-        $params = ['term' => $term];
-        if ($this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY')
-            && (!$this->isGranted('ROLE_ADMIN') || !$this->isGranted('ROLE_MODERATOR'))
-        ) {
-            $params += ['userId' => $this->getUser()->getId()];
+        $sortList = Helpers::getSortList();
+        if (array_key_exists($sort, $sortList)) {
+            $sortElem = $sortList[$sort];
+        } else {
+            $sortElem = reset($sortList);
         }
+        $params = [
+            'term' => $term,
+            'sort' => $sortElem
+        ];
+
+//        if ($this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY')
+//            && (!$this->isGranted('ROLE_ADMIN') || !$this->isGranted('ROLE_MODERATOR'))
+//        ) {
+//            $params += ['userId' => $this->getUser()->getId()];
+//        }
         $query =  $this->taskService->getTasksQuery($params);
         $paginator->paginate($query, $page, $limit);
         return new Response(

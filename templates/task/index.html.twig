@@ -17,15 +17,15 @@
                 <div class="mb-2">
                     <input id="query" class="form-control" type="text" placeholder="Поиск...">
                 </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="open" value="open" checked>
-                    <label class="form-check-label" for="open">Открытые</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="close" value="close" checked>
-                    <label class="form-check-label" for="close">Закрытые</label>
-                </div>
                 <h3 class="mb-3">Список задач:</h3>
+                <div class="sort-bar">
+                    <div class="sort-bar-title">Сортировать по:</div>
+                    <div class="sort-bar-list">
+                        {% for column in columns %}
+                            <a href="javascript:void(0);" class="tasks-sort" data-sort="" data-asc="{{ column.id }}_asc" data-desc="{{ column.id }}_desc" data-title="{{ column.title }}">{{ column.title }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
                 <div id="tasks"></div>
             </div>
         </div>
@@ -112,6 +112,41 @@
             let val = event.target.value;
             $.ajax({
                 url: '/task/show-all?query=' + val,
+                method: 'GET',
+                success: function (response) {
+                    $('#tasks').html(response);
+                },
+                error: function (response) {
+                    console.log(response);
+                }
+            });
+        });
+
+        $('.tasks-sort').on('click', function() {
+            $('.tasks-sort').not($(this)).each(function (i, obj) {
+                $(obj).removeClass('active');
+                $(obj).attr("data-sort", '');
+                $(obj).text($(obj).attr('data-title'));
+            });
+
+            let sort = $(this).attr('data-sort');
+            let asc = $(this).attr('data-asc');
+            let desc = $(this).attr('data-desc');
+            let title = $(this).attr('data-title');
+            if (sort === asc) {
+                sort = desc;
+                $(this).html(title + '<i>▲</i>');
+            } else if (sort === desc) {
+                sort = asc;
+                $(this).html(title + '<i>▼</i>');
+            } else {
+                sort = desc;
+                $(this).html(title + '<i>▲</i>');
+            }
+            $(this).addClass('active');
+            $(this).attr("data-sort", sort);
+            $.ajax({
+                url: '/task/show-all?sort=' + sort,
                 method: 'GET',
                 success: function (response) {
                     $('#tasks').html(response);
@@ -275,4 +310,33 @@
             }
         }
     </script>
+
+    <style>
+        .sort-bar {
+            margin-bottom: 20px;
+        }
+        .sort-bar-title {
+            display: inline-block;
+            margin-right: 10px;
+            color: #a7a7a7;
+        }
+        .sort-bar-list {
+            display: inline-block;
+        }
+        .sort-bar-list a {
+            color: #000;
+            text-decoration: none;
+            margin-right: 10px;
+            border-bottom: 1px dashed;
+        }
+        .sort-bar-list a i {
+            font-style: normal;
+            font-size: 10px;
+            line-height: 14px;
+            vertical-align: middle;
+        }
+        .sort-bar-list a.active {
+            color: #cb11ab;
+        }
+    </style>
 {% endblock %}
