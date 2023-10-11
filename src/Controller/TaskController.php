@@ -73,6 +73,15 @@ class TaskController extends AbstractController
         );
     }
 
+    #[Route('/task/view/{id}', name: 'task_view')]
+    public function view(int $id): Response
+    {
+        $task = $this->taskService->get($id);
+        return $this->render('task/view.html.twig', [
+            'task' => $task
+        ]);
+    }
+
     /**
      * @param int $id
      * @return Response

@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Задачa № {{ task.id }}{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <a class="float-start" href="{{ path('task') }}">Список задач</a>
+                {% if app.user %}
+                    <a class="float-end" href="{{ path('app_logout') }}">Выйти</a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">{{ task.title }}</h4>
+                <p class="card-text">{{ task.content }}</p>
+                {% if app.user %}
+                    <div id="rating_{{ task.id }}" class="rating-area">
+                        <input type="radio" id="star-5" name="rating" value="5">
+                        <label for="star-5" title="Оценка «5»"></label>
+                        <input type="radio" id="star-4" name="rating" value="4">
+                        <label for="star-4" title="Оценка «4»"></label>
+                        <input type="radio" id="star-3" name="rating" value="3">
+                        <label for="star-3" title="Оценка «3»"></label>
+                        <input type="radio" id="star-2" name="rating" value="2">
+                        <label for="star-2" title="Оценка «2»"></label>
+                        <input type="radio" id="star-1" name="rating" value="1">
+                        <label for="star-1" title="Оценка «1»"></label>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .rating-area {
+            float: left;
+            margin: 0 auto;
+        }
+        .rating-area:not(:checked) > input {
+            display: none;
+        }
+        .rating-area:not(:checked) > label {
+            float: right;
+            padding: 0;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+            color: lightgrey;
+            text-shadow: 1px 1px #bbb;
+        }
+        .rating-area:not(:checked) > label:before {
+            content: '★';
+        }
+        .rating-area > input:checked ~ label {
+            color: gold;
+            text-shadow: 1px 1px #c60;
+        }
+
+        .rating-area:not(:checked) > label:hover,
+        .rating-area:not(:checked) > label:hover ~ label {
+            color: gold;
+        }
+        .rating-area > input:checked + label:hover,
+        .rating-area > input:checked + label:hover ~ label,
+        .rating-area > input:checked ~ label:hover,
+        .rating-area > input:checked ~ label:hover ~ label,
+        .rating-area > label:hover ~ input:checked ~ label {
+            color: gold;
+            text-shadow: 1px 1px goldenrod;
+        }
+        .rate-area > label:active {
+            position: relative;
+        }
+    </style>
+{% endblock %}
