@@ -17,11 +17,11 @@ class Comment
     #[ORM\Column(length: 255)]
     private ?string $text = null;
 
-    #[ORM\ManyToOne(inversedBy: 'comments')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(inversedBy: 'comments')]
+    #[ORM\ManyToOne(targetEntity: Task::class, inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Task $task = null;
 
@@ -32,10 +32,10 @@ class Comment
     private ?\DateTimeInterface $updated_at = null;
 
     #[ORM\Column]
-    private ?bool $is_published = null;
+    private bool $is_published = false;
 
     #[ORM\Column]
-    private ?bool $archive = null;
+    private bool $archive = false;
 
     public function getId(): ?int
     {

@@ -24,7 +24,9 @@ class TaskService {
         $tasks = $this->taskRepository->findBy([], ['id' => 'desc']);
         $data = [];
         foreach ($tasks as $task) {
-            $data[] = $this->getTaskInfo($task);
+            if ($task) {
+                $data[] = $this->getTaskInfo($task);
+            }
         }
         return $data ?? [];
     }
@@ -36,7 +38,16 @@ class TaskService {
     public function get(int $id): array
     {
         $task = $this->taskRepository->find($id);
-        return $this->getTaskInfo($task) ?? [];
+        return $task ? $this->getTaskInfo($task) : [];
+    }
+
+    /**
+     * @param int $id
+     * @return Task|null
+     */
+    public function getTask(int $id): ?Task
+    {
+        return $this->taskRepository->find($id);
     }
 
     /**

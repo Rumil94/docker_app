@@ -4,8 +4,7 @@ namespace App\Controller;
 
 use App\Helpers\Helpers;
 use App\Utils\Paginator;
-use App\Service\TaskService;
-use App\Service\UserService;
+use App\Service\{ TaskService, UserService, CommentService };
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,10 +16,12 @@ class TaskController extends AbstractController
 {
     private UserService $userService;
     private TaskService $taskService;
+    private CommentService $commentService;
 
-    public function __construct(UserService $userService, TaskService $taskService, ) {
+    public function __construct(UserService $userService, TaskService $taskService, CommentService $commentService) {
         $this->userService = $userService;
         $this->taskService = $taskService;
+        $this->commentService = $commentService;
     }
 
     #[Route('/task', name: 'task')]
@@ -77,8 +78,10 @@ class TaskController extends AbstractController
     public function view(int $id): Response
     {
         $task = $this->taskService->get($id);
+        $comments = $this->commentService->listByTaskId($id);
         return $this->render('task/view.html.twig', [
-            'task' => $task
+            'task' => $task,
+            'comments' => $comments
         ]);
     }
 

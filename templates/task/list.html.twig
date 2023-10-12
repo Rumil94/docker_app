@@ -18,10 +18,10 @@
         <tr>
             <td class="text-center" style="width: 60px;">{{ num }}</td>
             <td class="text-center" style="width: 60px;">{{ task.id }}</td>
-            <td>
+            <td style="word-wrap: break-word;">
                 <a href="{{ path('task_view', { id: task.id }) }}">{{ task.title }}</a>
             </td>
-            <td>{{ task.content }}</td>
+            <td style="word-wrap: break-word;">{{ task.content }}</td>
             <td></td>
             {% if app.user %}
                 <td class="text-center" style="width: 300px;">

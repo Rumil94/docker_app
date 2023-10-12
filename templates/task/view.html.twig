@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Задачa № {{ task.id }}{% endblock %}
+{% block title %}Задачa{% endblock %}
 
 {% block body %}
     <div class="container">
@@ -12,25 +12,101 @@
                 {% endif %}
             </div>
             <div class="card-body">
-                <h4 class="card-title">{{ task.title }}</h4>
-                <p class="card-text">{{ task.content }}</p>
-                {% if app.user %}
-                    <div id="rating_{{ task.id }}" class="rating-area">
-                        <input type="radio" id="star-5" name="rating" value="5">
-                        <label for="star-5" title="Оценка «5»"></label>
-                        <input type="radio" id="star-4" name="rating" value="4">
-                        <label for="star-4" title="Оценка «4»"></label>
-                        <input type="radio" id="star-3" name="rating" value="3">
-                        <label for="star-3" title="Оценка «3»"></label>
-                        <input type="radio" id="star-2" name="rating" value="2">
-                        <label for="star-2" title="Оценка «2»"></label>
-                        <input type="radio" id="star-1" name="rating" value="1">
-                        <label for="star-1" title="Оценка «1»"></label>
+                {% if task is empty %}
+                    <p>Задача не найдена!</p>
+                {% else %}
+                    <h4 class="card-title">#{{ task.id }} {{ task.title }}</h4>
+                    <p class="card-text">{{ task.content }}</p>
+                    <p class="card-text">
+                        <small class="text-muted">Закрыта: {{ task.is_finished }}</small><br>
+                        <small class="text-muted">Дата создания: {{ task.created_at }}</small><br>
+                        <small class="text-muted">Автор: {{ task.user }}</small>
+                        {% if task.updated_at is not empty %}
+                            <br><small class="text-muted">Дата обновления: {{ task.updated_at }}</small>
+                        {% endif %}
+                    </p>
+                    {% if app.user %}
+                        <div id="rating_{{ task.id }}" class="rating-area">
+                            <input type="radio" id="star-5" name="rating" value="5">
+                            <label for="star-5" title="Оценка «5»"></label>
+                            <input type="radio" id="star-4" name="rating" value="4">
+                            <label for="star-4" title="Оценка «4»"></label>
+                            <input type="radio" id="star-3" name="rating" value="3">
+                            <label for="star-3" title="Оценка «3»"></label>
+                            <input type="radio" id="star-2" name="rating" value="2">
+                            <label for="star-2" title="Оценка «2»"></label>
+                            <input type="radio" id="star-1" name="rating" value="1">
+                            <label for="star-1" title="Оценка «1»"></label>
+                        </div>
+                    {% endif %}
+                    <br>
+                    <div>
+                        {% if app.user %}
+                            <div class="mb-3">
+                                <label for="comment" class="form-label">Добавление нового комментария:</label>
+                                <textarea type="text" class="form-control" id="comment" rows="3" placeholder="Введите ваш комментарий..."></textarea>
+                                <button type="button" class="btn btn-primary mt-3" onclick="addComment({{ task.id }})">Добавить</button>
+                            </div>
+                        {% else %}
+                            <p>Комментарии могут оставлять только авторизованные пользователи! <a href="{{ path('app_login') }}">Авторизация</a></p>
+                        {% endif %}
+                        <p>Комментарии: <span id="comments-count">({{ comments|length }})</span></p>
+                        {% if comments %}
+                            <div id="comments">
+                                {% for comment in comments %}
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <p>{{ comment.text }}
+                                                <br><small class="text-muted">Автор: {{ comment.user }}</small>
+                                                <br><small class="text-muted">Дата добавления: {{ comment.created_at }}</small>
+                                            </p>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
                 {% endif %}
             </div>
         </div>
     </div>
+
+    <script type="text/javascript">
+        function addComment(id) {
+            let data = {
+                text: $("#comment").val(),
+                id: id
+            };
+            $.ajax({
+                url: '/comment/create',
+                method: 'POST',
+                data: data,
+                success: function (response) {
+                    if (response.success === true) {
+                        comments = response.comments;
+                        if (comments.length > 0) {
+                            $('#comments-count').text('(' + comments.length + ')');
+                            $('#comment').val('');
+                            let html = '';
+                            for (let i = 0; i < comments.length; i++) {
+                                html += "<div class='card mb-3'>" +
+                                    "<div class='card-body'>" +
+                                    "<p>" + comments[i].text +
+                                    "<br><small class='text-muted'>Автор: " + comments[i].user + "</small>" +
+                                    "<br><small class='text-muted'>Дата добавления: " + comments[i].created_at + "</small></p></div></div>";
+                            }
+                            $('#comments').html(html);
+                        }
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (response) {
+                    console.log(response);
+                }
+            });
+        }
+    </script>
 
     <style>
         .rating-area {
