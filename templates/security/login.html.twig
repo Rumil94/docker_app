@@ -39,11 +39,11 @@
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
             </div>
             <div class="mb-3">
-                <label class="float-start"><input type="checkbox" value="remember-me"> Запомнить меня</label>
+                <label class="float-start"><input type="checkbox" name="_remember_me" checked> Запомнить меня</label>
             </div>
             <button class="mt-3 w-100 btn btn-lg btn-primary" type="submit">Войти</button>
             <div class="mt-3 mb-3">
-                <a href="#">Забыли пароль?</a>
+                <a href="{{ path('app_forgot_password_request') }}">Забыли пароль?</a>
             </div>
             <div class="clearfix">
                 <div class="float-start"><a href="{{ path('app_index') }}">На главную</a></div>

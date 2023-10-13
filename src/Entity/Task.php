@@ -31,7 +31,7 @@ class Task
     #[ORM\Column]
     private ?bool $is_finished = false;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'tasks')]
+    #[ORM\ManyToOne(inversedBy: 'tasks')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 

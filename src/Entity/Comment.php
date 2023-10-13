@@ -17,11 +17,11 @@ class Comment
     #[ORM\Column(length: 255)]
     private ?string $text = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'comments')]
+    #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(targetEntity: Task::class, inversedBy: 'comments')]
+    #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Task $task = null;
 
