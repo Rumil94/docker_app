@@ -8,7 +8,7 @@
             <div class="card-header">
                 <a class="float-start" href="{{ path('task') }}">Список задач</a>
                 {% if app.user %}
-                    <a class="float-end" href="{{ path('app_logout') }}">Выйти</a>
+                    <span class="float-end">{{ app.user.userIdentifier }} <a href="{{ path('app_logout') }}">Выйти</a></span>
                 {% endif %}
             </div>
             <div class="card-body">
