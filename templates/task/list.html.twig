@@ -25,9 +25,11 @@
             <td></td>
             {% if app.user %}
                 <td class="text-center" style="width: 300px;">
-                    <button class="btn btn-outline-info" onclick="showTask({{ task.id }})">Открыть</button>
-                    <button class="btn btn-outline-success" onclick="editTask({{ task.id }})">Изменить</button>
-                    <button class="btn btn-outline-danger" onclick="deleteTask({{ task.id }})">Удалить</button>
+                    {% if task.show_btns %}
+                        <button class="btn btn-outline-info" onclick="showTask({{ task.id }})">Открыть</button>
+                        <button class="btn btn-outline-success" onclick="editTask({{ task.id }})">Изменить</button>
+                        <button class="btn btn-outline-danger" onclick="deleteTask({{ task.id }})">Удалить</button>
+                    {% endif %}
                 </td>
             {% endif %}
         </tr>

@@ -8,7 +8,7 @@
             <div class="card-header">
                 {% if app.user %}
                     <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#form-modal" onclick="createTask(event)">Создать задачу</button>
-                    <a class="float-end" href="{{ path('app_logout') }}">Выйти</a>
+                    <span class="float-end">{{ app.user.userIdentifier }} <a href="{{ path('app_logout') }}">Выйти</a></span>
                 {% elseif not app.user %}
                     <p>Задачи могут создавать только авторизованные пользователи! <a href="{{ path('app_login') }}">Авторизация</a></p>
                 {% endif %}

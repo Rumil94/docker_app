@@ -59,13 +59,11 @@ class TaskController extends AbstractController
             'sort' => $sortElem
         ];
 
-//        if ($this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY')
-//            && (!$this->isGranted('ROLE_ADMIN') || !$this->isGranted('ROLE_MODERATOR'))
-//        ) {
-//            $params += ['userId' => $this->getUser()->getId()];
-//        }
         $query =  $this->taskService->getTasksQuery($params);
         $paginator->paginate($query, $page, $limit);
+        foreach ($paginator->getItems() as $item) {
+            $item->show_btns = $this->isGranted('ROLE_ADMIN') || ($this->getUser() && $item->getUser()->getId() == $this->getUser()->getId());
+        }
         return new Response(
             $this->renderView('task/list.html.twig', [
                 'startNum' => $startNum,

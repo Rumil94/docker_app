@@ -35,8 +35,8 @@ class TaskRepository extends ServiceEntityRepository
     public function save(Task $task): bool
     {
         try {
-            $this->registry->persist($task);
-            $this->registry->flush();
+            $this->getEntityManager()->persist($task);
+            $this->getEntityManager()->flush();
         } catch (\Exception $exception) {
             return false;
         }
@@ -50,8 +50,8 @@ class TaskRepository extends ServiceEntityRepository
     public function remove(Task $task): bool
     {
         try {
-            $this->registry->remove($task);
-            $this->registry->flush();
+            $this->getEntityManager()->remove($task);
+            $this->getEntityManager()->flush();
         } catch (\Exception $exception) {
             return false;
         }
