@@ -141,4 +141,9 @@ class Task
         }
         return $this;
     }
+
+    public function toString(): string
+    {
+        return $this->title . ' #'. $this->id;
+    }
 }

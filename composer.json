@@ -12,6 +12,7 @@
     "doctrine/doctrine-bundle": "^2.10",
     "doctrine/doctrine-migrations-bundle": "^3.2",
     "doctrine/orm": "^2.16",
+    "easycorp/easyadmin-bundle": "^4",
     "jolicode/elastically": "^1.8",
     "predis/predis": "^2.2",
     "symfony/console": "6.3.*",
