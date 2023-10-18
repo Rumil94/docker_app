@@ -15,16 +15,16 @@ class TaskCrudController extends AbstractCrudController
         return Task::class;
     }
 
-    public function configureCrud(Crud $crud): Crud
-    {
-        return $crud
-            ->setEntityLabelInPlural('Задачи')
-            ->setEntityLabelInSingular(
-                fn (?Task $task, ?string $pageName) => $task ? $task->toString() : 'Задача'
-            )
-            ->renderContentMaximized()
-            ->renderSidebarMinimized();
-    }
+//    public function configureCrud(Crud $crud): Crud
+//    {
+//        return $crud
+//            ->setEntityLabelInPlural('Задачи')
+//            ->setEntityLabelInSingular(
+//                fn (?Task $task, ?string $pageName) => $task ? $task->toString() : 'Задача'
+//            )
+//            ->renderContentMaximized()
+//            ->renderSidebarMinimized();
+//    }
 
 //    public function configureActions(Actions $actions): Actions
 //    {
